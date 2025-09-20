@@ -103,6 +103,9 @@ _For more details please refer to [Extend with Go](https://pocketbase.io/docs/go
 
 This fork includes WhatsApp Business API integration for sending OTP codes. Here's how to set it up:
 
+<img width="1920" height="998" alt="resim" src="https://github.com/user-attachments/assets/212dd3dc-c9b0-4509-89d7-9992c260ea6b" />
+
+
 ### Prerequisites
 
 1. **WhatsApp Business API Account** - You need a Meta Business account with WhatsApp Business API access
