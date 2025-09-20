@@ -86,6 +86,14 @@
             rateLimits: settings.rateLimits || { rules: [] },
         };
 
+        // Initialize WhatsApp fields if not present
+        if (!formSettings.meta.whatsappAccessToken) {
+            formSettings.meta.whatsappAccessToken = "";
+        }
+        if (!formSettings.meta.whatsappPhoneNumberId) {
+            formSettings.meta.whatsappPhoneNumberId = "";
+        }
+
         sortRules(formSettings.rateLimits.rules);
 
         originalFormSettings = JSON.parse(JSON.stringify(formSettings));
@@ -200,6 +208,43 @@
                         <Field class="form-field required" name="meta.appURL" let:uniqueId>
                             <label for={uniqueId}>Application URL</label>
                             <input type="text" id={uniqueId} required bind:value={formSettings.meta.appURL} />
+                        </Field>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="content txt-lg m-b-sm">
+                            <h3>WhatsApp Business API</h3>
+                            <p class="txt-muted">Configure WhatsApp Business API settings for OTP delivery.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <Field class="form-field" name="meta.whatsappAccessToken" let:uniqueId>
+                            <label for={uniqueId}>WhatsApp Access Token</label>
+                            <input
+                                type="password"
+                                id={uniqueId}
+                                placeholder="Enter your WhatsApp Business API access token"
+                                bind:value={formSettings.meta.whatsappAccessToken}
+                            />
+                            <div class="form-field-hint">
+                                Get this from Meta for Developers dashboard
+                            </div>
+                        </Field>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <Field class="form-field" name="meta.whatsappPhoneNumberId" let:uniqueId>
+                            <label for={uniqueId}>Phone Number ID</label>
+                            <input
+                                type="text"
+                                id={uniqueId}
+                                placeholder="Enter your WhatsApp phone number ID"
+                                bind:value={formSettings.meta.whatsappPhoneNumberId}
+                            />
+                            <div class="form-field-hint">
+                                Your WhatsApp Business phone number ID from Meta
+                            </div>
                         </Field>
                     </div>
                     <div class="col-lg-12">

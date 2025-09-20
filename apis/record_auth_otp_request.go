@@ -97,13 +97,36 @@ func recordRequestOTP(e *core.RequestEvent) error {
 				return err
 			}
 
-			// send OTP email
+			// send OTP via configured delivery method
 			// (in the background as a very basic timing attacks and emails enumeration protection)
 			// ---
 			routine.FireAndForget(func() {
-				err = mails.SendRecordOTP(originalApp, e.Record, otp.Id, e.Password)
-				if err != nil {
-					originalApp.Logger().Error("Failed to send OTP email", "error", errors.Join(err, originalApp.Delete(otp)))
+				var sendErr error
+				deliveryMethod := e.Collection.OTP.DeliveryMethod
+				
+				switch deliveryMethod {
+				case "email":
+					sendErr = mails.SendRecordOTP(originalApp, e.Record, otp.Id, e.Password)
+				case "whatsapp":
+					sendErr = mails.SendRecordOTPWhatsApp(originalApp, e.Record, otp.Id, e.Password)
+				case "both":
+					// Send via both methods
+					emailErr := mails.SendRecordOTP(originalApp, e.Record, otp.Id, e.Password)
+					whatsappErr := mails.SendRecordOTPWhatsApp(originalApp, e.Record, otp.Id, e.Password)
+					if emailErr != nil && whatsappErr != nil {
+						sendErr = errors.Join(emailErr, whatsappErr)
+					} else if emailErr != nil {
+						originalApp.Logger().Warn("Failed to send OTP via email, but WhatsApp succeeded", "error", emailErr)
+					} else if whatsappErr != nil {
+						originalApp.Logger().Warn("Failed to send OTP via WhatsApp, but email succeeded", "error", whatsappErr)
+					}
+				default:
+					// Fallback to email for backward compatibility
+					sendErr = mails.SendRecordOTP(originalApp, e.Record, otp.Id, e.Password)
+				}
+				
+				if sendErr != nil {
+					originalApp.Logger().Error("Failed to send OTP", "error", errors.Join(sendErr, originalApp.Delete(otp)))
 				}
 			})
 		}

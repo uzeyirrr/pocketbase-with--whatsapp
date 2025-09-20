@@ -489,11 +489,13 @@ func checkCronExpression(value any) error {
 // -------------------------------------------------------------------
 
 type MetaConfig struct {
-	AppName       string `form:"appName" json:"appName"`
-	AppURL        string `form:"appURL" json:"appURL"`
-	SenderName    string `form:"senderName" json:"senderName"`
-	SenderAddress string `form:"senderAddress" json:"senderAddress"`
-	HideControls  bool   `form:"hideControls" json:"hideControls"`
+	AppName                string `form:"appName" json:"appName"`
+	AppURL                 string `form:"appURL" json:"appURL"`
+	SenderName             string `form:"senderName" json:"senderName"`
+	SenderAddress          string `form:"senderAddress" json:"senderAddress"`
+	HideControls           bool   `form:"hideControls" json:"hideControls"`
+	WhatsAppAccessToken    string `form:"whatsappAccessToken" json:"whatsappAccessToken"`
+	WhatsAppPhoneNumberID  string `form:"whatsappPhoneNumberId" json:"whatsappPhoneNumberId"`
 }
 
 // Validate makes MetaConfig validatable by implementing [validation.Validatable] interface.

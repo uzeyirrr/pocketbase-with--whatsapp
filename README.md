@@ -17,6 +17,17 @@
 - convenient **Admin dashboard UI**
 - and simple **REST-ish API**
 
+## 🚀 Enhanced Features
+
+This fork extends PocketBase with additional features:
+
+- **📱 WhatsApp Business OTP Integration** - Send OTP codes via WhatsApp Business API
+- **📞 Phone Field Support** - Automatic phone field addition to users collection
+- **🔧 Multi-channel OTP Delivery** - Support for email, WhatsApp, or both delivery methods
+
+> [!NOTE]
+> **Testing Status**: These enhanced features are currently in development and have not been fully tested in production environments. Please use with caution and test thoroughly before deploying to production.
+
 **For documentation and examples, please visit https://pocketbase.io/docs.**
 
 > [!WARNING]
@@ -88,6 +99,55 @@ Here is a minimal example:
 
 _For more details please refer to [Extend with Go](https://pocketbase.io/docs/go-overview/)._
 
+## 📱 WhatsApp OTP Integration
+
+This fork includes WhatsApp Business API integration for sending OTP codes. Here's how to set it up:
+
+### Prerequisites
+
+1. **WhatsApp Business API Account** - You need a Meta Business account with WhatsApp Business API access
+2. **Access Token** - Get your access token from Meta for Developers
+3. **Phone Number ID** - Your WhatsApp Business phone number ID
+
+### Configuration
+
+1. **Admin Dashboard Setup:**
+   - Go to Settings > Application
+   - Fill in the WhatsApp Business API section:
+     - **WhatsApp Access Token**: Your Meta access token
+     - **Phone Number ID**: Your WhatsApp Business phone number ID
+
+2. **Collection OTP Settings:**
+   - Go to Collections > users (or your auth collection)
+   - Enable OTP in the Auth options
+   - Set **Delivery Method** to:
+     - `email` - Send OTP via email only
+     - `whatsapp` - Send OTP via WhatsApp only  
+     - `both` - Send OTP via both email and WhatsApp
+
+3. **Customize WhatsApp Template:**
+   - Edit the WhatsApp message template in collection settings
+   - Use placeholders: `{OTP}`, `{APP_NAME}`, `{RECORD_EMAIL}`, `{RECORD_ID}`
+
+### API Usage
+
+```bash
+# Request OTP via WhatsApp
+curl -X POST http://localhost:8090/api/collections/users/auth-with-otp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "otp": "12345678"
+  }'
+```
+
+### Example Implementation
+
+See `examples/whatsapp_otp_example.go` for a complete implementation example.
+
+> [!WARNING]
+> **Production Readiness**: This WhatsApp integration is experimental and requires thorough testing before production use. Ensure you have proper error handling and fallback mechanisms in place.
+
 ### Building and running the repo main.go example
 
 To build the minimal standalone executable, like the prebuilt ones in the releases page, you can simply run `go build` inside the `examples/base` directory:
@@ -139,10 +199,28 @@ All reports will be promptly addressed and you'll be credited in the fix release
 PocketBase is free and open source project licensed under the [MIT License](LICENSE.md).
 You are free to do whatever you want with it, even offering it as a paid service.
 
+### Enhanced Features Development
+
+This fork focuses on extending PocketBase with WhatsApp Business integration and enhanced OTP capabilities. We welcome contributions for:
+
+- **WhatsApp Business API improvements** - Better error handling, rate limiting, template management
+- **Multi-channel OTP enhancements** - SMS, Telegram, or other messaging platforms
+- **Phone number validation** - International phone number formatting and validation
+- **Testing and documentation** - Comprehensive tests for WhatsApp integration
+- **UI/UX improvements** - Better admin interface for OTP configuration
+
+### How to Contribute
+
 You could help continuing its development by:
 
 - [Contribute to the source code](CONTRIBUTING.md)
 - [Suggest new features and report issues](https://github.com/pocketbase/pocketbase/issues)
+- **Test WhatsApp integration** - Help us test the WhatsApp OTP functionality
+- **Documentation improvements** - Help improve setup guides and API documentation
+
+### Original PocketBase Contributing
+
+For the original PocketBase project:
 
 PRs for new OAuth2 providers, bug fixes, code optimizations and documentation improvements are more than welcome.
 

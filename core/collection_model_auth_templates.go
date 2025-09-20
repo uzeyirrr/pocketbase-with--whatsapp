@@ -62,6 +62,15 @@ var defaultOTPTemplate = EmailTemplate{
 </p>`,
 }
 
+var defaultWhatsAppOTPTemplate = MessageTemplate{
+	Message: `Hello! Your one-time password is: *` + EmailPlaceholderOTP + `*
+
+If you didn't request this OTP, please ignore this message.
+
+Thanks,
+` + EmailPlaceholderAppName + ` team`,
+}
+
 var defaultAuthAlertTemplate = EmailTemplate{
 	Subject: "Login from a new location",
 	Body: `<p>Hello,</p>

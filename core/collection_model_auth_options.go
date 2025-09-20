@@ -63,10 +63,12 @@ func (m *Collection) setDefaultAuthOptions() {
 			Duration: 1800, // 30min
 		},
 		OTP: OTPConfig{
-			Enabled:       false,
-			Duration:      180, // 3min
-			Length:        8,
-			EmailTemplate: defaultOTPTemplate,
+			Enabled:         false,
+			Duration:        180, // 3min
+			Length:          8,
+			DeliveryMethod:  "email",
+			EmailTemplate:   defaultOTPTemplate,
+			WhatsAppTemplate: defaultWhatsAppOTPTemplate,
 		},
 		AuthToken: TokenConfig{
 			Secret:   security.RandomString(50),
@@ -261,11 +263,38 @@ func (t EmailTemplate) Resolve(placeholders map[string]any) (subject, body strin
 		// replace subject placeholder params (if any)
 		subject = strings.ReplaceAll(subject, k, vStr)
 
-		// replace body placeholder params (if any)
-		body = strings.ReplaceAll(body, k, vStr)
+	// replace body placeholder params (if any)
+	body = strings.ReplaceAll(body, k, vStr)
 	}
 
 	return subject, body
+}
+
+// -------------------------------------------------------------------
+
+type MessageTemplate struct {
+	Message string `form:"message" json:"message"`
+}
+
+// Validate makes MessageTemplate validatable by implementing [validation.Validatable] interface.
+func (t MessageTemplate) Validate() error {
+	return validation.ValidateStruct(&t,
+		validation.Field(&t.Message, validation.Required),
+	)
+}
+
+// Resolve replaces the placeholder parameters in the current message
+// template and returns it as ready-to-use string.
+func (t MessageTemplate) Resolve(placeholders map[string]any) string {
+	message := t.Message
+
+	for k, v := range placeholders {
+		vStr := cast.ToString(v)
+		// replace message placeholder params (if any)
+		message = strings.ReplaceAll(message, k, vStr)
+	}
+
+	return message
 }
 
 // -------------------------------------------------------------------
@@ -317,11 +346,20 @@ type OTPConfig struct {
 	// Length specifies the auto generated password length.
 	Length int `form:"length" json:"length"`
 
+	// DeliveryMethod specifies how the OTP should be delivered (email, whatsapp, both)
+	DeliveryMethod string `form:"deliveryMethod" json:"deliveryMethod"`
+
 	// EmailTemplate is the default OTP email template that will be send to the auth record.
 	//
 	// In addition to the system placeholders you can also make use of
 	// [core.EmailPlaceholderOTPId] and [core.EmailPlaceholderOTP].
 	EmailTemplate EmailTemplate `form:"emailTemplate" json:"emailTemplate"`
+
+	// WhatsAppTemplate is the default OTP WhatsApp message template.
+	//
+	// In addition to the system placeholders you can also make use of
+	// [core.EmailPlaceholderOTPId] and [core.EmailPlaceholderOTP].
+	WhatsAppTemplate MessageTemplate `form:"whatsappTemplate" json:"whatsappTemplate"`
 }
 
 // Validate makes OTPConfig validatable by implementing [validation.Validatable] interface.
@@ -329,9 +367,11 @@ func (c OTPConfig) Validate() error {
 	return validation.ValidateStruct(&c,
 		validation.Field(&c.Duration, validation.When(c.Enabled, validation.Required, validation.Min(10), validation.Max(86400))),
 		validation.Field(&c.Length, validation.When(c.Enabled, validation.Required, validation.Min(4))),
+		validation.Field(&c.DeliveryMethod, validation.When(c.Enabled, validation.Required, validation.In("email", "whatsapp", "both"))),
 		// note: for now always run the email template validations even
 		// if not enabled since it could be used separately
 		validation.Field(&c.EmailTemplate),
+		validation.Field(&c.WhatsAppTemplate),
 	)
 }
 

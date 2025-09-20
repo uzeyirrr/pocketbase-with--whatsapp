@@ -326,6 +326,10 @@ func createUsersCollection(txApp core.App) error {
 		Name: "name",
 		Max:  255,
 	})
+	users.Fields.Add(&core.TextField{
+		Name: "phone",
+		Max:  20,
+	})
 	users.Fields.Add(&core.FileField{
 		Name:      "avatar",
 		MaxSelect: 1,
